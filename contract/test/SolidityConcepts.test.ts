@@ -47,6 +47,8 @@ describe('SolidityConcepts', function () {
       expect(await contract.FIXED_VALUE()).to.equal(100);
     });
 
+    console.log(3);
+
     it('address 타입의 public 불변(immutable) owner 변수가 배포자의 주소여야 합니다.', async function () {
       expect(await contract.owner()).to.equal(owner.address);
     });

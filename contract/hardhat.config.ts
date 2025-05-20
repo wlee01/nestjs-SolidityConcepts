@@ -10,8 +10,13 @@ const rpcUrl = process.env.RPC_URL;
 const config: HardhatUserConfig = {
   solidity: '0.8.28',
   networks: {
-    // Todo: 원하는 네트워크를 선택하여 설정합니다.
+    sepolia: {
+      url: 'https://sepolia.infura.io/v3/7f561ffb5e6b4b2fa98b24cd661e023f', // Infura 또는 Alchemy 등 RPC URL
+      accounts: [privateKey!], // 개인키 (0x로 시작하는 64자리 16진수 문자열)
+    },
   },
 };
 
 export default config;
+
+
