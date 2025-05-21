@@ -6,18 +6,11 @@ async function main() {
 
   console.log(`Deploying contracts with the account: ${deployer.address}`);
 
-  // 컨트랙트 팩토리 불러오기
-  const ContractFactory = await ethers.getContractFactory('SolidityConcepts');
-
-  // 배포
-  const contract = await ContractFactory.deploy();
-
-  // 대기: deployed() 대신 waitForDeployment()
+  const Contract = await ethers.getContractFactory('SolidityConcepts');
+  const contract = await Contract.deploy();
   await contract.waitForDeployment();
 
-  console.log(`SolidityConcepts contract deployed at: ${contract.target}`);
-
-  // ABI 파일 생성
+  console.log('SolidityConcepts contract deployed at: ${contract.target}');
   await makeAbi('SolidityConcepts', contract.target);
 }
 

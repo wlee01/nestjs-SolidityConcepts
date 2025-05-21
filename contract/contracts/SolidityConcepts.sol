@@ -12,28 +12,28 @@ contract SolidityConcepts {
         owner = msg.sender;
     }
 
-    function checkValue(uint256 input) public pure returns (string memory) {
-        if (input > 100) {
+    function checkValue(uint256 _value) public pure returns (string memory) {
+        if (_value > 100) {
             return "Value is greater than 100";
-        } else if (input == 100) {
+        } else if (_value == 100) {
             return "Value is exactly 100";
         } else {
             return "Value is less than 100";
         }
     }
 
-    function sumUpTo(uint256 input) public pure returns (uint256) {
+    function sumUpTo(uint256 _value) public pure returns (uint256) {
         uint256 sum = 0;
-        for (uint256 i = 1; i <= input; i++) {
+        for (uint256 i = 1; i <= _value; i++) {
             sum += i;
         }
         return sum;
     }
 
-    function updateValue(uint256 newValue) public {
+    function updateValue(uint256 _value) public {
         uint256 oldValue = value;
-        value = newValue;
-        emit ValueChanged(oldValue, newValue);
+        value = _value;
+        emit ValueChanged(oldValue, value);
     }
 
     modifier onlyOwner() {
@@ -49,9 +49,10 @@ contract SolidityConcepts {
     receive() external payable {}
 
     // 이더 송금 함수
-    function sendEther(address payable recipient) public payable {
+    function sendEther(address payable _address) public payable {
         require(msg.value > 0, "Must send ether");
-        recipient.transfer(msg.value);
+        (bool success, ) = _address.call{value: msg.value}("");
+        require(success, "Transfer failed");
     }
 
     // 컨트랙트의 현재 잔액 반환
@@ -60,7 +61,8 @@ contract SolidityConcepts {
     }
 
     // 소유자가 컨트랙트에서 이더 전액 출금
-    function withdraw() public onlyOwner {
-        payable(owner).transfer(address(this).balance);
+    function withDraw() public onlyOwner {
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Transfer failed");
     }
 }

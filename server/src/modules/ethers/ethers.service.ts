@@ -52,78 +52,80 @@ export class EthersService {
 
   // 위 코드는 지우지 마세요.
   async owner() {
-    return this.contract.owner();
+    return await this.contract.owner();
   }
 
   async fixedValue() {
-    const value = await this.contract.FIXED_VALUE();
-    return Number(value);
+    return await this.contract.FIXED_VALUE();
   }
 
   async value() {
-    const value = await this.contract.value();
-    return Number(value);
+    return await this.contract.value();
   }
 
   async checkValue(value: number) {
-    return this.contract.checkValue(value);
+    return await this.contract.checkValue(value);
   }
 
   async sumUpTo(value: number) {
-    const result = await this.contract.sumUpTo(value);
-    return Number(result);
+    return await this.contract.sumUpTo(value);
   }
 
   async updateValue(value: number) {
+    const result = {
+      oldValue: 0,
+      newValue: 0,
+    };
+
     const tx = await this.contract.updateValue(value);
     const receipt = await tx.wait();
 
-    let oldValue = 0;
-    let newValue = 0;
-
     for (const log of receipt.logs) {
-      try {
-        const parsedLog = this.contract.interface.parseLog(log);
-        if (parsedLog?.name === "ValueChanged") {
-          oldValue = Number(parsedLog.args.oldValue);
-          newValue = Number(parsedLog.args.newValue);
-          break;
-        }
-      } catch (e) {
-        // Ignore unrecognized logs
+      const logDescription = this.contract.interface.parseLog(
+        log
+      ) as LogDescription;
+
+      if (logDescription.fragment.name === 'ValueChanged') {
+        const oldValue = logDescription.args[0];
+        const newValue = logDescription.args[1];
+        result.oldValue = oldValue;
+        result.newValue = newValue;
       }
     }
-
-    return { oldValue, newValue };
+    return result;
   }
 
   async ownerFunction() {
-    return this.contract.ownerFunction();
+    return await this.contract.ownerFunction();
   }
 
   async sendEther(address: string, value: number) {
-    const tx = await this.signer.sendTransaction({
-      to: address,
-      value: parseEther(value.toString())
+    const tx = await this.contract.sendEther(address, {
+      value: this.parseEther(value.toString())
     });
-    return tx.wait();
+    const receipt = await tx.wait();
+
+    return receipt;
   }
 
   async getContractBalance() {
-    const balance = await this.provider.getBalance(this.contract.target);
-    return formatEther(balance);
+    const lawBalance = await this.contract.getContractBalance();
+    return this.formatEther(lawBalance);
+
   }
 
   async deposit(value: number) {
     const tx = await this.signer.sendTransaction({
       to: this.contract.target,
-      value: parseEther(value.toString())
+      value: this.parseEther(value.toString())
     });
-    return tx.wait();
+    const receipt = await tx.wait();
+    return receipt;
   }
 
   async withDraw() {
-    const tx = await this.contract.withdraw();
-    return tx.wait();
+    const tx = await this.contract.withDraw();
+    const receipt = await tx.wait();
+    return receipt;
   }
 }
