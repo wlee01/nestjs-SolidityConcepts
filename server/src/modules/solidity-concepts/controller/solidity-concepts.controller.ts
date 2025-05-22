@@ -6,7 +6,14 @@ import { SendEtherDto } from '../dto/send-ether.dto';
 export class SolidityConceptsController {
   constructor(
     private readonly solidityConceptsService: SolidityConceptsService
-  ) {}
+  ) { }
+
+  @Controller('solidity-concepts')
+  export class SolidityConceptsController {
+  constructor(
+    private readonly solidityConceptsService: SolidityConceptsService
+  ) { }
+
 
   @Get('owner')
   async getOwner() {
